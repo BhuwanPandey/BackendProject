@@ -1,0 +1,76 @@
+<form class="mx-auto w-75">
+    <input type="text" placeholder="Username"  id='l_user' autocomplete=""><br>
+    <input type="password" placeholder="Password" id='l_pass'><br>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" style="height: 20px; width: 20px;" onclick="myFunction()">
+        <label class="font-weight-bold text-white">Show Password</label>
+    </div>
+
+    {% if user.is_authenticated%}
+        <button id="btn1" disabled>Login</button>
+    {% else %}
+        <button id="btn1">Login</button>
+    {% endif%}
+    
+</form>
+
+<script>
+
+function myFunction() {
+  var x = document.getElementById("l_pass");
+  if (x.type === "password") {
+    x.type = "text";
+  } else {
+    x.type = "password";
+  }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+
+document.getElementById('btn1').addEventListener('click',(event)=>{
+    event.preventDefault();
+    const username=document.getElementById('l_user').value;
+    const password=document.getElementById('l_pass').value;
+    if(username.length==0 || password.length==0){
+        alert('username and password cannot be empty!')
+    }else{
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            const data=JSON.parse(this.responseText);
+            if(data.msg=='success'){
+                alert('user is authenticated !')
+                document.getElementById("btn1").disabled = true;
+                document.getElementById('l_user').value='';
+                document.getElementById('l_pass').value='';
+            }else{
+                alert(data.msg);
+            }
+        }
+        };
+        xhttp.open("POST", `/`, true);
+        xhttp.setRequestHeader('X-CSRFToken', csrftoken);
+        xhttp.setRequestHeader("Content-type", "text/plain");
+        xhttp.send(`${username}&${password}`);
+
+    }
+})
+
+</script>

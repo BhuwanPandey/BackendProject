@@ -1,0 +1,53 @@
+<form class="mx-auto w-75">
+    <input type="text" placeholder="Username"  id='reset_user'><br>
+    <input type="password" placeholder="New Password" id='reset_pass1'><br>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" style="height: 20px; width: 20px;" onclick="myFunction3()">
+        <label class="font-weight-bold text-white">Show Password</label>
+    </div>
+    <button id='btn3'>Reset</button>
+</form>
+
+<script>
+
+
+function myFunction3() {
+  var x = document.getElementById("reset_pass1");
+  if (x.type === "password") {
+    x.type = "text";
+  } else {
+    x.type = "password";
+  }
+}
+
+
+document.getElementById('btn3').addEventListener('click',(event)=>{
+    event.preventDefault();
+    const ruser=document.getElementById('reset_user').value;
+    const rpass1=document.getElementById('reset_pass1').value;
+
+    if(ruser.length==0 || rpass1.length==0 ){
+        alert('username and password cannot be empty!');
+    }
+    else{
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    const resp=JSON.parse(this.responseText);
+                    if(resp.msg=='error'){
+                        alert(`${ruser} doesnot  exist! `);
+                    }else{
+                        alert(`Password change successfully ! `);
+                        document.getElementById('reset_user').value='';
+                        document.getElementById('reset_pass1').value='';
+                    }
+                }
+            };
+            xhttp.open("POST", `/reset/`, true);
+            xhttp.setRequestHeader('X-CSRFToken', csrftoken);
+            xhttp.setRequestHeader("Content-type", "text/plain");
+            xhttp.send(`${ruser}&${rpass1}`);
+        }
+});
+
+</script>
